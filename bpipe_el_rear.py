@@ -8,17 +8,16 @@ class bpipe_el_rear(object):
     #_____________________________________________________________________________
     def __init__(self):
         #input points
-        self.pos = [(-16, -2), (-27, 45), (-31, 55), (-31, 65), (-27, 58)]
-        self.pos += [(-26, 66), (-18.5, 32), (-16, 27)]
+        self.pos = [(-16, -14.8), (-18.5, -5), (-23, -5), (-23, 5), (-21.5, 5)]
+        self.pos += [(-27, 23.4), (-31, 30.2), (-31, 40.2)]
+        self.pos += [(-27, 36.4), (-26, 45.2), (-18.5, 17.2), (-16, 14.2)]
         #points in z and x, both in m
         self.zx_pos = []
         for i in self.pos:
-            #self.zx_pos.append( {"z": i[0], "x": 0.01*i[1]} )
             # z at 0 and x at 1, converted to cm
             self.zx_pos.append( TVector2(i[0], 0.01*i[1]) )
-        #angle of initial rotation, 17 mrad
-        #self.theta_0 = -0.017
-        self.rotate(-0.017)
+        #angle of initial rotation, 25 mrad
+        self.rotate(-0.025)
 
     #_____________________________________________________________________________
     def rotate(self, theta):
@@ -36,7 +35,6 @@ class bpipe_el_rear(object):
 
         ipoint = 0
         for i in self.zx_pos:
-            #self.geom.SetPoint(ipoint, i["z"], 100*i["x"])
             self.geom.SetPoint(ipoint, i.X(), 100*i.Y())
             ipoint += 1
 

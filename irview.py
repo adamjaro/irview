@@ -31,8 +31,10 @@ if __name__ == "__main__":
 
     # 17 mrad for hadron beam,  25 mrad beam crossing angle
     ir.rotate(0.017)
+    #ir.rotate(0.025)
 
-    ir.draw_2d()
+    ir.draw_2d(-35, -90, 36, 104) # zmin, xmin, zmax, xmax
+    #ir.draw_2d(-35, -20, -2, 50)
 
     #ir.analysis()
 

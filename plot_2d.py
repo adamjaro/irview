@@ -4,7 +4,14 @@ from ROOT import gROOT, gPad, gStyle, TCanvas
 from ROOT import TIter, TText, TH1, TFrame
 
 #_____________________________________________________________________________
-class plot_2d():
+class plot_2d:
+    #_____________________________________________________________________________
+    def __init__(self, zmin, xmin, zmax, xmax):
+        self.zmin = zmin
+        self.xmin = xmin
+        self.zmax = zmax
+        self.xmax = xmax
+
     #_____________________________________________________________________________
     def draw(self, elements):
 
@@ -12,10 +19,9 @@ class plot_2d():
 
         gStyle.SetPadTickY(1)
         gStyle.SetPadTickX(1)
-        #gStyle.SetLineWidth(2)
 
         c1 = TCanvas("c1","c1",1000,700)
-        frame = gPad.DrawFrame(-35, -90, 36, 104) # xmin, ymin, xmax, ymax
+        frame = gPad.DrawFrame(self.zmin, self.xmin, self.zmax, self.xmax) # xmin, ymin, xmax, ymax in ROOT
         frame.SetTitle(";Length #it{z} (m);Horizontal #it{x} (cm)")
         siz = 0.035
         frame.SetTitleSize(siz)

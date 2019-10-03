@@ -137,9 +137,9 @@ class interaction_region:
         return lin
 
     #_____________________________________________________________________________
-    def draw_2d(self):
+    def draw_2d(self, zmin, xmin, zmax, xmax):
 
-        p2d = plot_2d()
+        p2d = plot_2d(zmin, xmin, zmax, xmax)
         p2d.draw(self.elements)
 
     #_____________________________________________________________________________
