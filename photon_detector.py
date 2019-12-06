@@ -7,9 +7,9 @@ class photon_detector(object):
     #_____________________________________________________________________________
     def __init__(self):
         #length, height and distance of the front side from the origin, all in m
-        self.length = 1.
+        self.length = 8.
         self.height = 0.15
-        self.dist = 26.
+        self.dist = 23.2
         self.angle = -0.025 # rotation to be on electron beam axis
 
     #_____________________________________________________________________________
@@ -39,19 +39,20 @@ class photon_detector(object):
 
         self.geom = TGraph(len(vec))
         self.geom.SetLineWidth(2)
-        self.geom.SetLineColor(rt.kYellow)
-        self.geom.SetFillColor(rt.kYellow+1)
+        self.geom.SetLineColor(rt.kYellow+1)
+        self.geom.SetFillColor(rt.kYellow)
         for i in xrange(len(vec)):
             self.geom.SetPoint(i, vec[i].X(), vec[i].Y()*100)
 
         self.geom.Draw("lfsame")
 
         #label
-        self.label = TText(vtrans.X(), (vtrans.Y()-self.height/2)*100-3, "Photon detector")
+        self.label = TText(vtrans.X(), (vtrans.Y()-self.height/2-0.11)*100-3, "Lumi detector")
         self.label.SetTextSize(0.03)
-        self.label.SetTextAngle(90)
-        self.label.SetTextAlign(32)
-        #self.label.Draw("same")
+        #self.label.SetTextAngle(90)
+        #self.label.SetTextAlign(32)
+        self.label.SetTextAlign(23)
+        self.label.Draw("same")
 
 
 

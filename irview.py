@@ -30,12 +30,30 @@ if __name__ == "__main__":
     ir.add_photon_detector()
 
     # 17 mrad for hadron beam,  25 mrad beam crossing angle
-    ir.rotate(0.017)
-    #ir.rotate(0.025)
+    #ir.rotate(0.017)
+    ir.rotate(0.025)
 
-    ir.draw_2d(-35, -90, 36, 104) # zmin, xmin, zmax, xmax
-    #ir.draw_2d(-35, -20, -2, 50)
+    #ir.draw_2d(-35, -90, 36, 104) # zmin, xmin, zmax, xmax
+    ir.draw_2d(-35, -40, -2, 55)
 
     #ir.analysis()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
