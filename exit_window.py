@@ -58,7 +58,7 @@ class exit_window(object):
         #self.label.SetTextAngle(90)
         #self.label.SetTextAlign(32)
         self.label.SetTextAlign(23)
-        self.label.Draw("same")
+        #self.label.Draw("same")
 
     #_____________________________________________________________________________
     def print_position(self):

@@ -54,7 +54,13 @@ class photon_detector(object):
         self.label.SetTextAlign(23)
         self.label.Draw("same")
 
-
+        #label for low Q^2 tagger
+        self.label_tag = TText(vtrans.X()+2, (vtrans.Y()+0.6)*100-3, "Place for low-Q2 tagger")
+        self.label_tag.SetTextSize(0.03)
+        #self.label.SetTextAngle(90)
+        #self.label.SetTextAlign(32)
+        self.label_tag.SetTextAlign(23)
+        self.label_tag.Draw("same")
 
 
 

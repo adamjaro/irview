@@ -6,6 +6,8 @@ from magnet import magnet
 from beam import beam
 from bpipe_el_rear import bpipe_el_rear
 from photon_detector import photon_detector
+from magnet_tab import magnet_tab
+from magnet_tab_sl import magnet_tab_sl
 
 from plot_2d import plot_2d
 
@@ -143,14 +145,119 @@ class interaction_region:
         p2d.draw(self.elements)
 
     #_____________________________________________________________________________
+    def load_tab(self, nam):
+
+        #load electron magnets from description table
+
+        for line in open(nam, "read"):
+
+            ll = line.split()
+
+            #comments and beginning line
+            if ll[0][0] == "#" or ll[0][0] == "0": continue
+
+            #magnets only
+            if ll[2] == "Drift" and ll[1].find("ECRAB") < 0:
+                continue
+
+            self.elements[ ll[1] ] = magnet_tab(ll)
+
+    #_____________________________________________________________________________
+    def load_tab_sl(self, nam):
+
+        #load electron magnets from description table with s and l of the elements
+
+        #table formatting
+        ft = {"s":3, "angle":7, "name":1, "etype":2, "l":4}
+
+        #current position along electron beam
+        bp = TVector2(0, 0); # x, z
+
+        s0 = 0. # movement in s
+        l0 = 0. # length of previous element
+        theta = 0. # angle of individual elements
+
+        iel = 0 # element index
+
+        for line in open(nam, "read"):
+
+            ll = line.split()
+
+            #comments and beginning line
+            if ll[0][0] == "#" or ll[0][0] == "0": continue
+
+            #load the s position and element length
+            s = float(ll[ft["s"]])
+
+            #if s > 96: break
+
+            delt = TVector2(0, s-s0-l0/2)
+            delt = delt.Rotate(theta)
+            s0 = s
+ 
+            #move to the next element
+            bp += delt;
+
+            #add the element, magnets only
+            name = ll[ft["name"]]
+            etype = ll[ft["etype"]]
+
+            if (etype != "Drift" and etype != "Marker") or name.find("ECRAB") >= 0:
+            #if True:
+
+                #more instances of the same name
+                if self.elements.get(name) is not None:
+                    name = name + "_" + str(iel)
+                    iel += 1
+
+                self.elements[name] = magnet_tab_sl(ll, bp, theta)
+
+                print name, bp.X(), bp.Y()
+
+            #move current position to the end of the current element
+            l0 = float(ll[ft["l"]])
+            delt = TVector2(0, l0/2)
+            delt = delt.Rotate(theta)
+            bp += delt;
+
+            #angle for the next element
+            theta += float(ll[ft["angle"]]) 
+
+        #manual entry for inner radii
+        self.elements["Q1ER"].rad1 = 0.066
+        self.elements["Q1ER"].rad2 = 0.079
+        self.elements["Q2ER"].rad1 = 0.083
+        self.elements["Q2ER"].rad2 = 0.094
+        self.elements["B2ER"].rad1 = 0.097
+        self.elements["B2ER"].rad2 = 0.139
+
+        self.elements["Q3ER"].rad1 = 0.040
+        self.elements["Q3ER"].rad2 = 0.045
+
+
+    #_____________________________________________________________________________
     def analysis(self):
         pass
         #general analysis
 
+        #Q3ER
+        #m = self.elements["Q3ER"]
+        #print "Q3ER", m.center_x, m.center_z
+
+        #B2eR location and dimensions for low Q2 simulations
+        #b2 = self.elements["B2ER"]
+        #print "B2eR:"
+        #print "x:", b2.center_x, "m"
+        #print "z:", b2.center_z, "m"
+        #print "length:", b2.length, "m"
+        #print "rad1:", b2.rad1, "m"
+        #print "rad2:", b2.rad2, "m"
+        #print "field:", b2.field, "T"
+
         #print angle of selected magnets
-        #mag = self.elements["Q1ER"]
-        #vec = TVector2(mag.center_z, mag.center_x)
-        #print "theta:", TMath.Pi()-vec.Phi()
+        mag = self.elements["Q1ER"]
+        vec = TVector2(mag.center_z, mag.center_x)
+        print "theta:", TMath.Pi()-vec.Phi()
 
         #angle between magnets
         #m0 = self.elements["Q1ER"]
@@ -163,9 +270,12 @@ class interaction_region:
         #m = self.elements["Q1ER"]
         #print m.center_z
 
+    #_____________________________________________________________________________
+    def print_magnets(self):
 
+        for i in self.elements.itervalues():
 
-
+            print i.name, i.center_x, i.center_z
 
 
 
