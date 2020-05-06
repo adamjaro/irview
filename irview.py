@@ -19,8 +19,8 @@ if __name__ == "__main__":
     #ir.read_survey_hadron("data/Hadron-275GeV.surveyRear")
     #ir.read_survey_hadron("data/Hadron-275GeV.surveyForward")
 
-    #ir.load_tab("data/200309-er-ip6-95832bb/er-95832bb.txt")
-    ir.load_tab_sl("data/200309-er-ip6-95832bb/er-95832bb.txt")
+    ir.load_tab("data/200309-er-ip6-95832bb/er-95832bb.txt", -40)
+    #ir.load_tab_sl("data/200309-er-ip6-95832bb/er-95832bb.txt", -40)
 
     #put the beams
     #ir.add_beam(-31, 32)
@@ -33,22 +33,23 @@ if __name__ == "__main__":
     #ir.add_photon_detector()
 
     # 17 mrad for hadron beam,  25 mrad beam crossing angle
-    #ir.rotate(-0.017)
+    #ir.rotate(0.017)
     #ir.rotate(-0.025)
     #ir.rotate(-0.06)
-    #ir.rotate(-0.008)
+    #ir.rotate(0)
+    ir.rotate(0.008)
     #ir.rotate(0.018332)
 
     #ir.draw_2d(-35, -90, 36, 104) # zmin, xmin, zmax, xmax
     #ir.draw_2d(-35, -40, -2, 55)
     #ir.draw_2d(-20, -80, -2, -40)
-    #ir.draw_2d(-35, -40, -2, 55)
-    #ir.draw_2d(-110, -30, 2, 200)
-    ir.draw_2d(-110, -90, 2, 200)
+    ir.draw_2d(-40, -30, -2, 70)
+    #ir.draw_2d(-40, -30, -2, 110)
+    #ir.draw_2d(-110, -90, 2, 200)
     #ir.draw_2d(-110, -30, 2, 300)
 
-    ir.analysis()
-    #ir.print_magnets()
+    #ir.analysis()
+    ir.print_magnets()
 
 
 

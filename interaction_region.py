@@ -17,6 +17,7 @@ class interaction_region:
     #_____________________________________________________________________________
     def __init__(self):
         self.elements = {}
+        self.element_names = []
 
     #_____________________________________________________________________________
     def rotate(self, theta):
@@ -29,7 +30,7 @@ class interaction_region:
             i.rotate(theta)
 
         #unify theta for rear electron magnets
-        self.elements["B2ER"].THETA = self.elements["Q1ER"].THETA
+        #self.elements["B2ER"].THETA = self.elements["Q1ER"].THETA
 
     #_____________________________________________________________________________
     def add_photon_detector(self):
@@ -145,9 +146,14 @@ class interaction_region:
         p2d.draw(self.elements)
 
     #_____________________________________________________________________________
-    def load_tab(self, nam):
+    def load_tab(self, nam, smax=999):
 
         #load electron magnets from description table
+
+        #table format
+        ft = {"name":1, "etype":2, "s":3}
+
+        iel = 0 # element index for multiple instances of the same name
 
         for line in open(nam, "read"):
 
@@ -156,19 +162,44 @@ class interaction_region:
             #comments and beginning line
             if ll[0][0] == "#" or ll[0][0] == "0": continue
 
+            #max s position to load
+            s = float(ll[ft["s"]])
+            if smax<0 and -s < smax: break
+
             #magnets only
-            if ll[2] == "Drift" and ll[1].find("ECRAB") < 0:
+            name = ll[ft["name"]]
+            etype = ll[ft["etype"]]
+            if (etype == "Drift" and name.find("ECRAB") < 0) or etype == "Marker":
                 continue
 
-            self.elements[ ll[1] ] = magnet_tab(ll)
+            #more instances of the same name
+            if self.elements.get(name) is not None:
+                name = name + "_" + str(iel)
+                iel += 1
+
+            #add the magnet
+            self.elements[name] = magnet_tab(ll)
+            self.element_names.append(name)
+
+        #manual entry for inner radii
+        self.elements["Q1ER"].rad1 = 0.066
+        self.elements["Q1ER"].rad2 = 0.079
+        self.elements["Q2ER"].rad1 = 0.083
+        self.elements["Q2ER"].rad2 = 0.094
+        self.elements["B2ER"].rad1 = 0.097
+        self.elements["B2ER"].rad2 = 0.139
+
+        self.elements["Q3ER"].rad1 = 0.040
+        self.elements["Q3ER"].rad2 = 0.045
 
     #_____________________________________________________________________________
-    def load_tab_sl(self, nam):
+    def load_tab_sl(self, nam, smax=999):
 
         #load electron magnets from description table with s and l of the elements
 
         #table formatting
         ft = {"s":3, "angle":7, "name":1, "etype":2, "l":4}
+        #ft = {"s":5, "angle":7, "name":1, "etype":2, "l":6}
 
         #current position along electron beam
         bp = TVector2(0, 0); # x, z
@@ -189,7 +220,7 @@ class interaction_region:
             #load the s position and element length
             s = float(ll[ft["s"]])
 
-            #if s > 96: break
+            if smax<0 and -s < smax: break
 
             delt = TVector2(0, s-s0-l0/2)
             delt = delt.Rotate(theta)
@@ -211,8 +242,9 @@ class interaction_region:
                     iel += 1
 
                 self.elements[name] = magnet_tab_sl(ll, bp, theta)
+                self.element_names.append(name)
 
-                print name, bp.X(), bp.Y()
+                #print name, bp.X(), bp.Y()
 
             #move current position to the end of the current element
             l0 = float(ll[ft["l"]])
@@ -273,9 +305,11 @@ class interaction_region:
     #_____________________________________________________________________________
     def print_magnets(self):
 
-        for i in self.elements.itervalues():
+        #for i in self.elements.itervalues():
+        for name in self.element_names:
+            i = self.elements[name]
 
-            print i.name, i.center_x, i.center_z
+            print i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length, " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA
 
 
 
