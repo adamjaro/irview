@@ -26,6 +26,13 @@ class vmagnet(object):
         self.Z = 0.
         self.THETA = 0.
         self.has_survey = False
+        #drawing configuration
+        self.fill_style = 1000
+        self.label_down = False
+        self.label = ""
+        self.no_label = False
+        self.line_col = rt.kBlue
+        self.fill_col = rt.kGreen-2
 
     #_____________________________________________________________________________
     def read_survey(self, lin):
@@ -37,6 +44,20 @@ class vmagnet(object):
         self.Z = float( lin["Z"] )
         self.THETA = float( lin["THETA"] ) + self.theta_0
         self.has_survey = True
+
+    #_____________________________________________________________________________
+    def rotate_translateX(self, theta, xt):
+
+        #combined rotation and translation
+        self.rotate(theta)
+        self.translateX(xt)
+
+    #_____________________________________________________________________________
+    def translateX(self, xt):
+
+        #translate the magnet along x
+
+        self.center_x += xt
 
     #_____________________________________________________________________________
     def rotate(self, theta):
@@ -84,12 +105,10 @@ class vmagnet(object):
 
         #export points to the graph
         self.gbox = TGraph(len(vec)+1)
-        col = rt.kRed
-        if self.is_electron == True: col = rt.kBlue
-        self.gbox.SetLineColor(col)
+        self.gbox.SetLineColor(self.line_col)
         self.gbox.SetLineWidth(2)
-        #self.gbox.SetFillColor(rt.kGray+1)
-        self.gbox.SetFillColor(rt.kGreen-2)
+        self.gbox.SetFillStyle(self.fill_style)
+        self.gbox.SetFillColor(self.fill_col)
 
         for i in xrange(len(vec)):
             self.gbox.SetPoint(i, vec[i].X(), 100*vec[i].Y())
@@ -100,11 +119,13 @@ class vmagnet(object):
         self.gbox.Draw("lfsame")
 
         #label
-        lx = (self.center_x + self.rad2)*100 + 4
+        if self.no_label: return
+        #lx = (self.center_x + self.rad2)*100 + 4
+        lx = (self.center_x + (self.rad1+self.rad2)/2)*100 + 4
         if lx < 30: lx = 30
         align = 12
         #left down
-        if self.center_z < 0 and not self.is_electron:
+        if (self.center_z < 0 and not self.is_electron) or self.label_down:
             lx = (self.center_x - self.rad2)*100 - 4
             align = 32
         #right down
@@ -116,7 +137,9 @@ class vmagnet(object):
             if self.center_x < -0.4:
                 lx = (self.center_x + self.rad2)*100 + 4
                 align = 12
-        self.glabel = TText(self.center_z, lx, self.name)
+        if self.label == "":
+            self.label = self.name
+        self.glabel = TText(self.center_z, lx, self.label)
         #self.glabel.SetTextSize(0.03)
         self.glabel.SetTextSize(0.02)
         self.glabel.SetTextAngle(90)

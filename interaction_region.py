@@ -8,6 +8,7 @@ from bpipe_el_rear import bpipe_el_rear
 from photon_detector import photon_detector
 from magnet_tab import magnet_tab
 from magnet_tab_sl import magnet_tab_sl
+from detector import detector
 
 from plot_2d import plot_2d
 
@@ -31,6 +32,25 @@ class interaction_region:
 
         #unify theta for rear electron magnets
         #self.elements["B2ER"].THETA = self.elements["Q1ER"].THETA
+
+    #_____________________________________________________________________________
+    def translateX(self, xt):
+
+        #translate the elements along x
+
+        for i in self.elements.itervalues():
+            #select elements with translation
+            if not hasattr(i, "translateX"): continue
+
+            #apply the translation
+            i.translateX(xt)
+
+    #_____________________________________________________________________________
+    def rotate_translateX(self, theta, xt):
+
+        #combined rotatation and translation
+        self.rotate(theta)
+        self.translateX(xt)
 
     #_____________________________________________________________________________
     def add_photon_detector(self):
@@ -169,7 +189,8 @@ class interaction_region:
             #magnets only
             name = ll[ft["name"]]
             etype = ll[ft["etype"]]
-            if (etype == "Drift" and name.find("ECRAB") < 0) or etype == "Marker":
+            if etype == "Marker": continue
+            if etype == "Drift" and name.find("ECRAB")<0 and name.find("D3ER")<0:
                 continue
 
             #more instances of the same name
@@ -181,16 +202,61 @@ class interaction_region:
             self.elements[name] = magnet_tab(ll)
             self.element_names.append(name)
 
+        self.set_inner_radii()
+
+        #electron tagger in central beam frame
+        #tag = detector("lowQ2", -27, 0.472, 0.35, 0.1, 0.02, self.elements, self.element_names)
+        #tag.rotate(-0.008)
+
+        #two taggers in outgoing beam frame
+        tag1 = detector("lowQ2_1", -24, 0.31, 0.35, 0.4, 0, self.elements, self.element_names)
+        tag1.label = "Tagger 1"
+        tag2 = detector("lowQ2_2", -37, 0.205, 0.35, 0.3, 0, self.elements, self.element_names)
+        tag2.label = "Tagger 2"
+
+        for itag in tag1, tag2: itag.rotate_translateX(-0.026332, -0.224548100304)
+
+        #luminosity detector in central beam frame
+        colim = detector("colim", -27, 0, 0.3, 0.3, 0, self.elements, self.element_names)
+        colim.label = "Colimator"
+        ew = detector("ew", -20.75, 0.06, 2.5, 0.13*2, 0.1, self.elements, self.element_names)
+        ew.label = "Exit window"
+        lumi_dipole = detector("lumi_dipole", -28, 0, 0.6, 0.1, 0, self.elements, self.element_names)
+        lumi_dipole.label = "Spectrometer dipole"
+        phot = detector("phot", -37, 0, 0.35, 0.2, 0, self.elements, self.element_names)
+        phot.label = "Luminosity detectors"
+        up = detector("up", -36.5, 0.1+0.042, 0.35, 0.2, 0, self.elements, self.element_names)
+        up.no_label = True
+        down = detector("down", -36.5, -0.1-0.042, 0.35, 0.2, 0, self.elements, self.element_names)
+        down.no_label = True
+
+        for ilumi in colim, ew, lumi_dipole, phot, up, down:
+            ilumi.rotate(-0.008)
+            ilumi.label_down = True
+
+
+
+    #_____________________________________________________________________________
+    def set_inner_radii(self):
+
         #manual entry for inner radii
         self.elements["Q1ER"].rad1 = 0.066
         self.elements["Q1ER"].rad2 = 0.079
         self.elements["Q2ER"].rad1 = 0.083
         self.elements["Q2ER"].rad2 = 0.094
-        self.elements["B2ER"].rad1 = 0.097
-        self.elements["B2ER"].rad2 = 0.139
 
-        self.elements["Q3ER"].rad1 = 0.040
-        self.elements["Q3ER"].rad2 = 0.045
+        B2 = self.elements["B2ER"]
+        B2.rad1 = 0.097
+        B2.rad2 = 0.139
+
+        Q3 = self.elements["Q3ER"]
+        Q3.rad1 = 0.040
+        Q3.rad2 = 0.045
+
+        D3 = self.elements["D3ER"]
+        D3.rad1 = B2.rad2
+        D3.rad2 = Q3.rad1
+        D3.fill_style = 3207
 
     #_____________________________________________________________________________
     def load_tab_sl(self, nam, smax=999):
@@ -233,7 +299,7 @@ class interaction_region:
             name = ll[ft["name"]]
             etype = ll[ft["etype"]]
 
-            if (etype != "Drift" and etype != "Marker") or name.find("ECRAB") >= 0:
+            if (etype != "Drift" and etype != "Marker") or name.find("ECRAB")>=0 or name.find("D3ER")>=0:
             #if True:
 
                 #more instances of the same name
@@ -255,16 +321,12 @@ class interaction_region:
             #angle for the next element
             theta += float(ll[ft["angle"]]) 
 
-        #manual entry for inner radii
-        self.elements["Q1ER"].rad1 = 0.066
-        self.elements["Q1ER"].rad2 = 0.079
-        self.elements["Q2ER"].rad1 = 0.083
-        self.elements["Q2ER"].rad2 = 0.094
-        self.elements["B2ER"].rad1 = 0.097
-        self.elements["B2ER"].rad2 = 0.139
+        self.set_inner_radii()
 
-        self.elements["Q3ER"].rad1 = 0.040
-        self.elements["Q3ER"].rad2 = 0.045
+        #electron tagger
+        detector("lowQ2", -27, 0.472, 0.35, 0.1, 0.02, self.elements, self.element_names)
+
+
 
 
     #_____________________________________________________________________________
@@ -309,6 +371,12 @@ class interaction_region:
         for name in self.element_names:
             i = self.elements[name]
 
+            #elements with own print
+            if hasattr(i, "print_pos"):
+                i.print_pos()
+                continue
+
+            #default action
             print i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length, " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA
 
 
