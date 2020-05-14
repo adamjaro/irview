@@ -1,6 +1,6 @@
 
 import ROOT as rt
-from ROOT import TFrame, TText
+from ROOT import TFrame, TText, TLatex
 from ROOT import  TGraph, TVector2, TMath
 
 #_____________________________________________________________________________
@@ -139,9 +139,10 @@ class vmagnet(object):
                 align = 12
         if self.label == "":
             self.label = self.name
-        self.glabel = TText(self.center_z, lx, self.label)
-        #self.glabel.SetTextSize(0.03)
-        self.glabel.SetTextSize(0.02)
+        #self.glabel = TText(self.center_z, lx, self.label)
+        self.glabel = TLatex(self.center_z, lx, self.label)
+        self.glabel.SetTextSize(0.03)
+        #self.glabel.SetTextSize(0.02)
         self.glabel.SetTextAngle(90)
         self.glabel.SetTextAlign(align)
         self.glabel.Draw("same")

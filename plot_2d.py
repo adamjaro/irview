@@ -44,14 +44,15 @@ class plot_2d:
             el.draw_2d()
 
         #redraw these elements on the top
-        draw_top = ["Q0EF", "beam_electron", "beam_hadron"]
+        #draw_top = ["Q0EF", "beam_electron", "beam_hadron"]
+        draw_top = ["ew"]
         for i in draw_top:
             el = elements.get(i)
             if el is not None: el.draw_2d()
 
         gPad.SetGrid()
 
-        self.invert_col(gPad)
+        #self.invert_col(gPad)
 
         c1.SaveAs("01fig.pdf")
 

@@ -10,6 +10,7 @@ if __name__ == "__main__":
     ir = interaction_region()
 
     #ir.load_magnets("data/magnets_electron_forward_18GeV_20190617.txt")
+    ir.load_magnets("data/electrons_close/TB42g_zeRN351L.txt")
     #ir.load_magnets("data/magnets_electron_rear_18GeV_20190617.txt")
 
     #ir.load_magnets("data/magnets_hadron_forward_275GeV_20190617.txt", is_electron=False)
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     #ir.read_survey_hadron("data/Hadron-275GeV.surveyRear")
     #ir.read_survey_hadron("data/Hadron-275GeV.surveyForward")
 
-    ir.load_tab("data/200309-er-ip6-95832bb/er-95832bb.txt", -40)
+    #ir.load_tab("data/200309-er-ip6-95832bb/er-95832bb.txt", -40)
     #ir.load_tab_sl("data/200309-er-ip6-95832bb/er-95832bb.txt", -40)
 
     #put the beams
@@ -44,10 +45,16 @@ if __name__ == "__main__":
     #central beam frame
     #ir.rotate(0.008)
     #ir.draw_2d(-40, -80, -2, 120)
+    #ir.draw_2d(-40, -80, 0, 120) # with ecal
 
     #outgoing beam frame
-    ir.rotate_translateX(0.026332, 0.224548100304)
-    ir.draw_2d(-40, -120, -2, 90)
+    #ir.rotate_translateX(0.026332, 0.224548100304)
+    #ir.draw_2d(-40, -120, -2, 90)
+    #ir.draw_2d(-40, -125, 0, 125) # with ecal
+
+    #up to B2eR, central beam frame
+    ir.rotate(0.008)
+    ir.draw_2d(-17, -150, 0, 150)
 
     #ir.draw_2d(-35, -90, 36, 104) # zmin, xmin, zmax, xmax
     #ir.draw_2d(-35, -40, -2, 55)
@@ -58,7 +65,7 @@ if __name__ == "__main__":
     #ir.draw_2d(-110, -30, 2, 300)
 
     #ir.analysis()
-    ir.print_magnets()
+    #ir.print_magnets()
 
 
 

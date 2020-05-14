@@ -9,6 +9,7 @@ from photon_detector import photon_detector
 from magnet_tab import magnet_tab
 from magnet_tab_sl import magnet_tab_sl
 from detector import detector
+from detector_cen import detector_cen
 
 from plot_2d import plot_2d
 
@@ -75,17 +76,39 @@ class interaction_region:
 
         #input loop
         for line in open(nam, "read"):
-            line = line.lstrip()
+            line = line.strip()
+
+            #empty line
+            if line == "": continue
+
             #comment
             if line.find("#") == 0:
                 if line[1:].lstrip().find("name") == 0:
                     #get table format
                     ft = self.get_formtab(line[1:]) # 1: is to strip # character
                 continue
+
             #set dictionary with magnet parameters
             lin = self.get_parameters(line, ft)
+
+            #add center_z if start_z is provided
+            if lin.get("start_z") is not None:
+                lin["center_z"] = str( -float(lin["start_z"]) - float(lin["length"])/2 )
+
             #add the magnet to the elements
-            self.elements[ lin["name"].upper() ] = magnet(lin, is_electron)
+            nam = lin["name"].upper()
+            mag = magnet(lin, is_electron)
+            mag.THETA = float(lin["angle"])*1e-3
+            mag.has_survey = True
+            self.elements[ nam ] = mag
+            self.element_names.append(nam)
+
+        #move to default frame
+        self.rotate(0.017)
+
+        #ecal in central beam frame
+        ecal = detector_cen("ECAL", -3.28, 0.1, 0.95, 0.2, 0, self.elements, self.element_names)
+        ecal.rotate(-0.008)
 
     #_____________________________________________________________________________
     def read_survey_hadron(self, nam):
@@ -224,7 +247,7 @@ class interaction_region:
         lumi_dipole = detector("lumi_dipole", -28, 0, 0.6, 0.1, 0, self.elements, self.element_names)
         lumi_dipole.label = "Spectrometer dipole"
         phot = detector("phot", -37, 0, 0.35, 0.2, 0, self.elements, self.element_names)
-        phot.label = "Luminosity detectors"
+        phot.label = "Luminosity det"
         up = detector("up", -36.5, 0.1+0.042, 0.35, 0.2, 0, self.elements, self.element_names)
         up.no_label = True
         down = detector("down", -36.5, -0.1-0.042, 0.35, 0.2, 0, self.elements, self.element_names)
@@ -234,7 +257,9 @@ class interaction_region:
             ilumi.rotate(-0.008)
             ilumi.label_down = True
 
-
+        #ecal in central beam frame
+        ecal = detector_cen("ECAL", -3.28, 0.08, 0.62, 0.2, 0, self.elements, self.element_names)
+        ecal.rotate(-0.008)
 
     #_____________________________________________________________________________
     def set_inner_radii(self):
@@ -377,7 +402,9 @@ class interaction_region:
                 continue
 
             #default action
-            print i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length, " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA
+            print i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length,
+            print " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA,
+            print "start_z:", i.center_z+i.length/2.
 
 
 
