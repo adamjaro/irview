@@ -100,7 +100,7 @@ class vmagnet(object):
 
         #rotate along magnet axis and move to magnet center
         vpos = TVector2(self.center_z, self.center_x)
-        for i in xrange(len(vec)):
+        for i in range(len(vec)):
             vec[i] = vec[i].Rotate(-self.THETA) + vpos
 
         #export points to the graph
@@ -110,7 +110,7 @@ class vmagnet(object):
         self.gbox.SetFillStyle(self.fill_style)
         self.gbox.SetFillColor(self.fill_col)
 
-        for i in xrange(len(vec)):
+        for i in range(len(vec)):
             self.gbox.SetPoint(i, vec[i].X(), 100*vec[i].Y())
 
         #last point same as the first

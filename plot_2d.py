@@ -39,7 +39,7 @@ class plot_2d:
         gPad.SetBottomMargin(0.09)
 
         #loop over elements
-        for el in elements.itervalues():
+        for el in elements.values():
             if not hasattr(el, "draw_2d"): continue
             el.draw_2d()
 
@@ -52,7 +52,7 @@ class plot_2d:
 
         gPad.SetGrid()
 
-        #self.invert_col(gPad)
+        self.invert_col(gPad)
 
         c1.SaveAs("01fig.pdf")
 

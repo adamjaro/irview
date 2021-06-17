@@ -37,6 +37,6 @@ class detector_cen(object):
     #_____________________________________________________________________________
     def print_pos(self):
 
-        print self.name, "zpos:", self.center_z+self.length/2, "xpos:", self.center_x,
-        print "theta:", self.THETA, "zcen:", self.center_z
+        print(self.name, "zpos:", self.center_z+self.length/2, "xpos:", self.center_x)
+        print("theta:", self.THETA, "zcen:", self.center_z)
 

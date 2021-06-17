@@ -1,4 +1,6 @@
 
+from pandas import read_csv
+
 import ROOT as rt
 from ROOT import TVector2, TMath
 
@@ -10,6 +12,7 @@ from magnet_tab import magnet_tab
 from magnet_tab_sl import magnet_tab_sl
 from detector import detector
 from detector_cen import detector_cen
+from magnet_csv import magnet_csv
 
 from plot_2d import plot_2d
 
@@ -52,6 +55,12 @@ class interaction_region:
         #combined rotatation and translation
         self.rotate(theta)
         self.translateX(xt)
+
+    #_____________________________________________________________________________
+    def add_element(self, el):
+
+        self.elements[el.name] = el
+        self.element_names.append(el.name)
 
     #_____________________________________________________________________________
     def add_photon_detector(self):
@@ -262,6 +271,20 @@ class interaction_region:
         ecal.rotate(-0.008)
 
     #_____________________________________________________________________________
+    def load_csv(self, nam):
+
+        #electron magnets from a csv
+        
+        inp = read_csv(nam)
+
+        for i, row in inp.iterrows():
+
+            #add the magnet
+            name = row["name"]
+            self.elements[name] = magnet_csv(row)
+            self.element_names.append(name)
+
+    #_____________________________________________________________________________
     def set_inner_radii(self):
 
         #manual entry for inner radii
@@ -376,7 +399,7 @@ class interaction_region:
         #print angle of selected magnets
         mag = self.elements["Q1ER"]
         vec = TVector2(mag.center_z, mag.center_x)
-        print "theta:", TMath.Pi()-vec.Phi()
+        print("theta:", TMath.Pi()-vec.Phi())
 
         #angle between magnets
         #m0 = self.elements["Q1ER"]
@@ -402,9 +425,9 @@ class interaction_region:
                 continue
 
             #default action
-            print i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length,
-            print " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA,
-            print "start_z:", i.center_z+i.length/2.
+            print(i.name, " z:", i.center_z, " x:", i.center_x, " l:", i.length,\
+            " r1:", i.rad1, " r2:", i.rad2, " theta:", i.THETA,\
+            "start_z:", i.center_z+i.length/2.)
 
 
 
